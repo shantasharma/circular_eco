@@ -53,14 +53,3 @@ circularagent/
 ├── simulators/
 │   ├── pet_simulator.py
 │   └── rpet_simulator.py
-```
-
----
-
-# === requirements.txt ===
-streamlit
-
-# Optional: include only what's actually needed
-# pandas
-# numpy
-# rich
