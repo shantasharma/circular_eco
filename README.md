@@ -1,13 +1,3 @@
-# === Project: CircularAgent MVP — README and Requirements ===
-
-# 📁 Final Folder Additions
-# circularagent/
-# ├── ...
-# ├── README.md             # Describes the project clearly
-# └── requirements.txt      # For pip install
-
-# === README.md ===
-
 # CircularAgent: Sustainable Material Advisor ♻️
 
 **CircularAgent** is an autonomous agent designed to help manufacturers transition to more sustainable materials.
