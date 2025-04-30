@@ -32,7 +32,7 @@ streamlit run app.py
 - Recommended material: **rPET**
 
 ## 🧠 Architecture Diagram
-![alt text](architecture.png)
+![Architecture](architecture.png)
 
 ## 💡 Motivation
 Manufacturers are under increasing pressure to meet ESG and sustainability goals. However, the decision to switch materials is complex. CircularAgent automates this reasoning process.
