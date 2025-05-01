@@ -1,0 +1,4 @@
+together
+pandas
+requests
+streamlit

@@ -1,4 +1,4 @@
-# === agents/insight_synthesizer.py ===
+from agents.utils.together_llm import together_chat_completion
 
 def synthesize_insight(plan, ref_result, alt_results):
     insights = []
@@ -18,30 +18,33 @@ def synthesize_insight(plan, ref_result, alt_results):
         insight += f"- Suppliers: {', '.join(suppliers)}\n"
         insights.append(insight)
 
-        # Decision making based on priority
+        # Decision logic
         if plan['priority'] == "cost":
             score = cost_diff
         elif plan['priority'] == "emissions":
             score = emissions_diff
         elif plan['priority'] == "emissions_under_cost_constraint":
-            if cost_diff <= 0.05:  # <=5% cost increase allowed
-                score = emissions_diff
-            else:
-                score = None
+            score = emissions_diff if cost_diff <= 0.05 else None
         else:
             score = None
 
-        if score is not None:
-            if best_score is None or score < best_score:
-                best_score = score
-                best_material = material
+        if score is not None and (best_score is None or score < best_score):
+            best_score = score
+            best_material = material
 
-    summary = "\n=== Material Alternatives Summary ===\n"
-    summary += "\n".join(insights)
+    explanation = ""
+    try:
+        if plan.get("show_reasoning", False):
+            prompt = f"Given the sustainability goal '{plan['goal']}', explain why switching from {plan['current_material']} to {best_material} is the best choice."
+            explanation = together_chat_completion(prompt)
+    except Exception as e:
+        explanation = "LLM explanation unavailable."
 
+    summary = "\n=== Material Alternatives Summary ===\n" + "\n".join(insights)
     if best_material:
-        summary += f"\n\n✅ Recommended Material: {best_material}\n"
-        summary += f"Reason: Best fit for '{plan['priority']}' objective."
+        summary += f"\n\n✅ Recommended Material: {best_material}\nReason: Best fit for '{plan['priority']}' objective."
+        if plan.get("show_reasoning"):
+            summary += f"\n\n💬 LLM Justification:\n{explanation}"
     else:
         summary += "\n\n⚠️ No material meets the constraints."
 

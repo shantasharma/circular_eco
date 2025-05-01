@@ -1,26 +1,35 @@
+from agents.utils.together_llm import together_chat_completion
+
 def interpret_user_input(user_text):
-    plan = {
-        "industry": "packaging",
-        "process": "bottle_manufacturing",
-        "current_material": "PET",
-        "goal": "reduce_footprint",
-        "constraints": [],
-        "priority": "emissions"  # default
-    }
+    try:
+        prompt = f"""
+You are an expert in sustainable manufacturing planning.
+Given the user's goal, extract the following as a JSON object:
+- goal: the sustainability objective
+- material: current or suggested material (e.g. PET)
+- constraints: any stated constraints
+- priority: 'emissions', 'cost', or 'emissions_under_cost_constraint'
 
-    lower_text = user_text.lower()
+User: {user_text}
+"""
+        raw_output = together_chat_completion(prompt)
+        structured = eval(raw_output) if isinstance(raw_output, str) else raw_output
 
-    # Detect material if explicitly mentioned
-    if "bottle" in lower_text:
-        plan["current_material"] = "PET"
-
-    # Detect primary optimization goal
-    if "cost" in lower_text and "emission" not in lower_text:
-        plan["priority"] = "cost"
-    elif "emission" in lower_text and "cost" not in lower_text:
-        plan["priority"] = "emissions"
-    elif "cost" in lower_text and "emission" in lower_text:
-        plan["priority"] = "emissions_under_cost_constraint"
-        plan["constraints"].append("no major cost increase (e.g., <5%)")
-
-    return plan
+        return {
+            "industry": "packaging",
+            "process": "bottle_manufacturing",
+            "current_material": structured.get("material", "PET"),
+            "goal": structured.get("goal", "reduce_footprint"),
+            "constraints": structured.get("constraints", []),
+            "priority": structured.get("priority", "emissions")
+        }
+    except Exception as e:
+        print("LLM parsing failed, falling back. Reason:", e)
+        return {
+            "industry": "packaging",
+            "process": "bottle_manufacturing",
+            "current_material": "PET",
+            "goal": "reduce_footprint",
+            "constraints": ["no major cost increase"],
+            "priority": "emissions_under_cost_constraint"
+        }

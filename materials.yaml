@@ -1,0 +1,8 @@
+PET:
+  cost_per_kg: 1.10
+  energy_per_kg: 5.2
+  water_per_kg: 2.5
+rPET:
+  cost_per_kg: 1.00
+  energy_per_kg: 3.0
+  water_per_kg: 1.2
